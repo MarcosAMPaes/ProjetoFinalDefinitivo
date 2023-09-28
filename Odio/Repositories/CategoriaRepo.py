@@ -3,7 +3,7 @@ from typing import List
 from models.Categoria import Categoria
 from util.Database import Database
 
-class ProjetoRepo:
+class CategproaRepo:
     @classmethod
     def criarTabela(cls):
         sql = """
