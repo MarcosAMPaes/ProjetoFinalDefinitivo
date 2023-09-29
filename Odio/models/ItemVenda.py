@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 @dataclass
 class ItemVenda:
-    idVenda: int
     idProduto: int
+    idVenda: int
     quantidade: str
     valorUnit: str
     subtotal: str

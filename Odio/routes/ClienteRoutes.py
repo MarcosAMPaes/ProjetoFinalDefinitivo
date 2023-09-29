@@ -12,8 +12,8 @@ app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
 
-@app.get('/cadastro', response_class=HTMLResponse)
-async def root(request: Request):
+@app.get('/cadastro', response_class=HTMLResponse,)
+async def root(request: Request, usuario: Usuario = Depends(validar_usuario_logado)):
     return templates.TemplateResponse("cadastro.html", {"request": request,})
 
 @app.get('/carrinho', response_class=HTMLResponse)

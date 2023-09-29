@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from typing import Optional
+
 
 @dataclass
 class Cliente:
@@ -6,9 +8,9 @@ class Cliente:
     nome: str
     email: str
     telefone: str
-    endLogradouro: str
-    endNumero: str
-    endComplemento: str
-    endBairro: str
-    endCidade:str
-    endUf: str
+    endLogradouro: Optional[str] = ""
+    endNumero: Optional[str] = ""
+    endComplemento: Optional[str] = ""
+    endBairro: Optional[str] = ""
+    endCidade:Optional[str] = ""
+    endUf: Optional[str] = ""

@@ -5,4 +5,6 @@ from dataclasses import dataclass
 class Usuario:
     id: int
     nome: str
-    senha: str
+    senha: Optional[str] = ""
+    token: Optional[str] = ""
+    admin: bool = False
