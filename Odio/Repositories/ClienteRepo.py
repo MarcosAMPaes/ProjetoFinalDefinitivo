@@ -1,0 +1,266 @@
+from typing import List
+from models.Cliente import Cliente
+from models.Usuario import Usuario
+from util.Database import Database
+
+
+class ClienteRepo:
+    @classmethod
+    def criarTabela(cls):
+        sql = """
+            CREATE TABLE IF NOT EXISTS Usuario(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            email TEXT NOT NULL,
+            senha TEXT NOT NULL,
+            telefone TEXT NOT NULL,
+            endLogradouro TEXT,
+            endNumero TEXT,
+            cep TEXT,
+            token TEXT,
+            admin BOOLEAN NOT NULL DEFAULT 0,
+            idUsuario INTEGER,
+            UNIQUE (email),
+            FOREIGN KEY(idUsuario) REFERENCES usuario(id))
+        """
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        tableCreated = cursor.execute(sql).rowcount > 0
+        conexao.commit()
+        conexao.close()
+        return tableCreated
+
+   
+
+    @classmethod
+    def inserir(cls, cliente: Cliente) -> Cliente:
+        sql = "INSERT INTO cliente (nome, email, senha, telefone, endLogradouro, endNumero, cep, token, idUsuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(
+            sql, (cliente.nome, cliente.email, cliente.senha, cliente.telefone, cliente.endLogradouro, cliente.endNumero, cliente.cep, cliente.token, cliente.idUsuario)
+        )
+        if resultado.rowcount > 0:
+            cliente.id = resultado.lastrowid
+        conexao.commit()
+        conexao.close()
+        return cliente
+
+    @classmethod
+    def alterar(cls, cliente: Cliente) -> Cliente:
+        sql = "UPDATE cliente SET nome=?, cliente.email=?, telefone=?, endLogradouro=?, endNumero=?, cep=?, idUsuario=? WHERE id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (cliente.nome, cliente.email, cliente.telefone,cliente.endLogradouro,cliente.endNumero, cliente.cep, cliente.id))
+        if resultado.rowcount > 0:
+            conexao.commit()
+            conexao.close()
+            return cliente
+        else:
+            conexao.close()
+            return None
+
+    @classmethod
+    def alterarSenha(cls, id: int, senha: str) -> bool:
+        sql = "UPDATE cliente SET senha=? WHERE id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (senha, id))
+        if resultado.rowcount > 0:
+            conexao.commit()
+            conexao.close()
+            return True
+        else:
+            conexao.close()
+            return False
+
+    @classmethod
+    def alterarToken(cls, email: str, token: str) -> bool:
+        sql = "UPDATE cliente SET token=? WHERE email=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (token, email))
+        if resultado.rowcount > 0:
+            conexao.commit()
+            conexao.close()
+            return True
+        else:
+            conexao.close()
+            return False
+
+    @classmethod
+    def alterarAdmin(cls, id: int, admin: bool) -> bool:
+        sql = "UPDATE cliente SET admin=? WHERE id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (admin, id))
+        if resultado.rowcount > 0:
+            conexao.commit()
+            conexao.close()
+            return True
+        else:
+            conexao.close()
+            return False
+
+    @classmethod
+    def aprovarCadastro(cls, id: int, aprovar: bool = True) -> bool:
+        sql = "UPDATE cliente SET aprovado=? WHERE id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (aprovar, id))
+        if resultado.rowcount > 0:
+            conexao.commit()
+            conexao.close()
+            return True
+        else:
+            conexao.close()
+            return False
+
+    @classmethod
+    def emailExiste(cls, email: str) -> bool:
+        sql = "SELECT EXISTS (SELECT 1 FROM cliente WHERE email=?)"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (email,)).fetchone()        
+        return bool(resultado[0])
+
+    @classmethod
+    def obterSenhaDeEmail(cls, email: str) -> str | None:
+        sql = "SELECT senha FROM cliente WHERE email=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (email,)).fetchone()
+        if resultado:
+            return str(resultado[0])
+        else:
+            return None
+
+    @classmethod
+    def excluir(cls, id: int) -> bool:
+        sql = "DELETE FROM cliente WHERE id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (id,))
+        if resultado.rowcount > 0:
+            conexao.commit()
+            conexao.close()
+            return True
+        else:
+            conexao.close()
+            return False
+
+    @classmethod
+    def obterTodos(cls) -> List[Cliente]:
+        sql = "SELECT cliente.id, cliente.nome, cliente.email, cliente.admin, cliente.idProjeto, projeto.nome AS nomeProjeto FROM cliente INNER JOIN projeto ON cliente.idProjeto = projeto.id ORDER BY cliente.nome"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql).fetchall()
+        objetos = [
+            Cliente(
+                id=x[0],
+                nome=x[1],
+                email=x[2],
+                admin=x[3],
+                idProjeto=x[4],
+                nomeProjeto=x[5],
+            )
+            for x in resultado
+        ]
+        return objetos
+
+    @classmethod
+    def obterPagina(cls, pagina: int, tamanhoPagina: int) -> List[Cliente]:
+        inicio = (pagina - 1) * tamanhoPagina
+        sql = "SELECT cliente.id, cliente.nome, cliente.email, cliente.admin, cliente.idProjeto, projeto.nome AS nomeProjeto FROM cliente INNER JOIN projeto ON cliente.idProjeto = projeto.id WHERE cliente.aprovado = 1 ORDER BY cliente.nome LIMIT ?, ?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (inicio, tamanhoPagina)).fetchall()
+        objetos = [
+            Cliente(
+                id=x[0],
+                nome=x[1],
+                email=x[2],
+                admin=x[3],
+                idProjeto=x[4],
+                nomeProjeto=x[5],
+            )
+            for x in resultado
+        ]
+        return objetos
+
+    @classmethod
+    def obterQtdePaginas(cls, tamanhoPagina: int) -> int:
+        sql = "SELECT CEIL(CAST((SELECT COUNT(*) FROM cliente WHERE aprovado = 1 AND idProjeto IS NOT NULL) AS FLOAT) / ?) AS qtdePaginas"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (tamanhoPagina,)).fetchone()
+        return int(resultado[0])
+
+    @classmethod
+    def obterPaginaAprovar(cls, pagina: int, tamanhoPagina: int) -> List[Cliente]:
+        inicio = (pagina - 1) * tamanhoPagina
+        sql = "SELECT cliente.id, cliente.nome, cliente.email, cliente.admin, cliente.idProjeto, projeto.nome AS nomeProjeto FROM cliente INNER JOIN projeto ON cliente.idProjeto = projeto.id WHERE cliente.aprovado = 0 ORDER BY cliente.dataCadastro LIMIT ?, ?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (inicio, tamanhoPagina)).fetchall()
+        objetos = [
+            Cliente(
+                id=x[0],
+                nome=x[1],
+                email=x[2],
+                admin=x[3],
+                idProjeto=x[4],
+                nomeProjeto=x[5],
+            )
+            for x in resultado
+        ]
+        return objetos
+
+    @classmethod
+    def obterQtdePaginasAprovar(cls, tamanhoPagina: int) -> int:
+        sql = "SELECT CEIL(CAST((SELECT COUNT(*) FROM cliente WHERE aprovado = 0 AND idProjeto IS NOT NULL) AS FLOAT) / ?) AS qtdePaginas"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (tamanhoPagina,)).fetchone()
+        return int(resultado[0])
+
+    @classmethod
+    def obterQtdeAprovar(cls) -> int:
+        sql = "SELECT COUNT(*) FROM cliente WHERE aprovado = 0 AND idProjeto IS NOT NULL"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql).fetchone()
+        return int(resultado[0])
+
+    @classmethod
+    def obterPorId(cls, id: int) -> Cliente | None:
+        sql = "SELECT cliente.id, cliente.nome, cliente.email, cliente.admin, cliente.aprovado, cliente.idProjeto, projeto.nome AS nomeProjeto FROM cliente INNER JOIN projeto ON cliente.idProjeto = projeto.id WHERE cliente.id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (id,)).fetchone()
+        if (resultado):
+            objeto = Cliente(
+                id=resultado[0],
+                nome=resultado[1],
+                email=resultado[2],
+                admin=resultado[3],
+                aprovado=resultado[4],
+                idProjeto=resultado[5],
+                nomeProjeto=resultado[6],
+            )
+            return objeto
+        else: 
+            return None
+
+    @classmethod
+    def obterUsuarioPorToken(cls, token: str) -> Usuario:
+        sql = "SELECT id, nome, email, admin FROM cliente WHERE token=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        # quando se executa fechone em um cursor sem resultado, ele retorna None
+        resultado = cursor.execute(sql, (token,)).fetchone()
+        if resultado:
+            objeto = Usuario(*resultado)
+            return objeto
+        else:
+            return None

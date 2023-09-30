@@ -1,10 +1,10 @@
 # models/Projeto.py
 from dataclasses import dataclass
+from typing import Optional
 
 @dataclass
 class Usuario:
     id: int
     nome: str
-    senha: Optional[str] = ""
-    token: Optional[str] = ""
+    email: str
     admin: bool = False

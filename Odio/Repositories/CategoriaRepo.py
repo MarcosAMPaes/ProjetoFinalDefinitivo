@@ -3,7 +3,7 @@ from typing import List
 from models.Categoria import Categoria
 from util.Database import Database
 
-class CategproaRepo:
+class CategoriaRepo:
     @classmethod
     def criarTabela(cls):
         sql = """
@@ -60,30 +60,13 @@ class CategproaRepo:
         
     @classmethod
     def obterTodos(cls) -> List[Categoria]:
-        sql = "SELECT nome FROM projeto ORDER BY nome"
+        sql = "SELECT nome FROM categoria ORDER BY nome"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql).fetchall()
         objetos = [Categoria(*x) for x in resultado]
         return objetos
     
-    @classmethod
-    def obterPagina(cls, pagina: int, tamanhoPagina: int) -> List[Categoria]:
-        inicio = (pagina - 1) * tamanhoPagina
-        sql = "SELECT nome FROM projeto ORDER BY nome LIMIT ?, ?"
-        conexao = Database.criarConexao()
-        cursor = conexao.cursor()
-        resultado = cursor.execute(sql, (inicio, tamanhoPagina)).fetchall()
-        objetos = [Categoria(*x) for x in resultado]
-        return objetos
-    
-    @classmethod
-    def obterQtdePaginas(cls, tamanhoPagina: int) -> int:
-        sql = "SELECT CEIL(CAST((SELECT COUNT(*) FROM categoria) AS FLOAT) / ?) AS qtdePaginas"
-        conexao = Database.criarConexao()
-        cursor = conexao.cursor()
-        resultado = cursor.execute(sql, (tamanhoPagina, )).fetchone()
-        return int(resultado[0])
     
     @classmethod
     def obterPorId(cls, id: int) -> Categoria:

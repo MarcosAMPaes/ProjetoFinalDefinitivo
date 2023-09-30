@@ -5,9 +5,8 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 
-from Odio.Repositories.AdministradorRepo import AdministradorRepo
-from Odio.Repositories.CategoriaRepo import CategproaRepo
-from Odio.Repositories.ProdutoRepo import ProdutoRepo
+from Repositories.CategoriaRepo import CategproaRepo
+from Repositories.ProdutoRepo import ProdutoRepo
 
 
 from routes.MainRoutes import router as mainRouter
@@ -19,11 +18,11 @@ from routes.FechamentoRoutes import router as fechamentoRouter
 app = FastAPI()
 
 
-AdministradorRepo.criarTabela()
-CategproaRepo.criarTabela()
-"""ClienteRepo.criarTabela()
-ItemVenda.criarTabela()"""
-ProdutoRepo.criarTabela()
+"""AdministradorRepo.criarTabela()"""
+"""CategproaRepo.criarTabela()"""
+"""ClienteRepo.criarTabela()"""
+"""ItemVenda.criarTabela()"""
+"""ProdutoRepo.criarTabela()"""
 """VendaRepo.criarTabela()"""
 
 
