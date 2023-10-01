@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends, FastAPI, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from Repositories.ItemVendaRepo import ItemVendaRepo
 from util.security import gerar_token, validar_usuario_logado
 from util.templateFilters import formatarData
 
@@ -12,14 +13,15 @@ app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
 
-@app.get('/cadastro', response_class=HTMLResponse,)
-async def root(request: Request, usuario: Usuario = Depends(validar_usuario_logado)):
+@router.get('/cadastro', response_class=HTMLResponse,)
+async def root(request: Request):
     return templates.TemplateResponse("cadastro.html", {"request": request,})
 
-@app.get('/carrinho', response_class=HTMLResponse)
+@router.get('/carrinho', response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("carrinho.html", {"request": request,})
+    carrinho = ItemVendaRepo.obterTodos()
+    return templates.TemplateResponse("carrinho.html", {"request": request, 'carrinho': carrinho})
 
-@app.get('/cadastrarnovasenha', response_class=HTMLResponse)
+@router.get('/cadastrarnovasenha', response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("cadastrarnovasenha.html", {"request": request,})

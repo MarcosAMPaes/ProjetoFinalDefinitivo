@@ -9,7 +9,7 @@ class CategoriaRepo:
         sql = """
             CREATE TABLE IF NOT EXISTS categoria (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,)
+            nome TEXT NOT NULL)
         """
         conexao = Database.criarConexao()
         cursor = conexao.cursor()

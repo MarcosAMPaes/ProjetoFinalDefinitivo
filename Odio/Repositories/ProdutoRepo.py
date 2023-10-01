@@ -1,4 +1,4 @@
-# repositories/ProjetoRepo.py
+# repositories/produtoRepo.py
 from typing import List
 from models.Produto import Produto
 from util.Database import Database
@@ -9,10 +9,13 @@ class ProdutoRepo:
         sql = """
             CREATE TABLE IF NOT EXISTS produto (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            idCategoria INT NOT NULL,
             nome TEXT NOT NULL,
+            descricao TEXT NOT NULL,
             estoque INT NOT NULL,
             preco FLOAT NOT NULL,
-            descricao TEXT NOT NULL)
+            imgProduto TEXT,
+            FOREIGN KEY (idCategoria) REFERENCES categoria(id))
         """
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
@@ -63,7 +66,7 @@ class ProdutoRepo:
         
     @classmethod
     def obterTodos(cls) -> List[Produto]:
-        sql = "SELECT nome, estoque, preco, descricao FROM projeto ORDER BY nome"
+        sql = "SELECT id, idCategoria, nome, estoque, preco, descricao, imgProduto FROM produto ORDER BY nome"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql).fetchall()
@@ -73,7 +76,7 @@ class ProdutoRepo:
     @classmethod
     def obterPagina(cls, pagina: int, tamanhoPagina: int) -> List[Produto]:
         inicio = (pagina - 1) * tamanhoPagina
-        sql = "SELECT nome, estoque, preco, descricao FROM projeto ORDER BY nome LIMIT ?, ?"
+        sql = "SELECT nome, estoque, preco, descricao FROM produto ORDER BY nome LIMIT ?, ?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql, (inicio, tamanhoPagina)).fetchall()
@@ -90,7 +93,7 @@ class ProdutoRepo:
     
     @classmethod
     def obterPorId(cls, id: int) -> Produto:
-        sql = "SELECT id, nome, descricao FROM projeto WHERE id=?"
+        sql = "SELECT id, nome, descricao FROM produto WHERE id=?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql, (id, )).fetchone()

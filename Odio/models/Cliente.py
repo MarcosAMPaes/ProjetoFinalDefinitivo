@@ -9,7 +9,7 @@ class Cliente:
     nome: str
     email: str
     senha: Optional[str] = ""
-    telefone: str
+    telefone: Optional[str] = ""
     endLogradouro: Optional[str] = ""
     endNumero: Optional[str] = ""
     cep: Optional[str] = ""

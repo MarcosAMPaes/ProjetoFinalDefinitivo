@@ -1,23 +1,21 @@
 from typing import List
-from models.Cliente import Cliente
-from models.Cliente import Cliente
 from util.Database import Database
+from models.ItemVenda import ItemVenda
 
 
-class ClienteRepo:
+class ItemVendaRepo:
     @classmethod
     def criarTabela(cls):
         sql = """
-            CREATE TABLE IF NOT EXISTS Usuario(
+            CREATE TABLE IF NOT EXISTS Item_Venda(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            email TEXT NOT NULL,
-            senha TEXT NOT NULL,
-            token TEXT,
-            admin BOOLEAN NOT NULL DEFAULT 0,
-            idCliente INTEGER,
-            UNIQUE (email),
-            CONSTRAINT fkClienteProjeto FOREIGN KEY(idProjeto) REFERENCES projeto(id))
+            idVenda INTEGER,
+            idProduto INTEGER,
+            quantidade INTEGER NOT NULL,
+            subtotal FLOAT,
+            FOREIGN KEY (idVenda) REFERENCES venda(id),
+            FOREIGN KEY (idProduto) REFERENCES produto(id)
+            )
         """
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
@@ -25,3 +23,27 @@ class ClienteRepo:
         conexao.commit()
         conexao.close()
         return tableCreated
+    
+
+    @classmethod
+    def inserir(cls, ItemVenda: ItemVenda) -> ItemVenda:
+        sql = "INSERT INTO item_venda (idVenda, idProduto, quantidade, subtotal) VALUES (?, ?, ?, ?)"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(
+            sql, (ItemVenda.idVenda, ItemVenda.idProduto, ItemVenda.quantidade, ItemVenda.subtotal)
+        )
+        if resultado.rowcount > 0:
+            ItemVenda.id = resultado.lastrowid
+        conexao.commit()
+        conexao.close()
+        return ItemVenda
+    
+    @classmethod
+    def obterTodos(cls) -> List[ItemVenda]:
+        sql = "SELECT * FROM item_venda"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql).fetchall()
+        objetos = [ItemVenda(*x) for x in resultado]
+        return objetos

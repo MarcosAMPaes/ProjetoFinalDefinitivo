@@ -1,6 +1,5 @@
 from typing import List
 from models.Cliente import Cliente
-from models.Usuario import Usuario
 from util.Database import Database
 
 
@@ -8,18 +7,17 @@ class ClienteRepo:
     @classmethod
     def criarTabela(cls):
         sql = """
-            CREATE TABLE IF NOT EXISTS Usuario(
+            CREATE TABLE IF NOT EXISTS cliente(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            idUsuario INTEGER,
             nome TEXT NOT NULL,
             email TEXT NOT NULL,
             senha TEXT NOT NULL,
             telefone TEXT NOT NULL,
-            endLogradouro TEXT,
             endNumero TEXT,
             cep TEXT,
             token TEXT,
             admin BOOLEAN NOT NULL DEFAULT 0,
-            idUsuario INTEGER,
             UNIQUE (email),
             FOREIGN KEY(idUsuario) REFERENCES usuario(id))
         """
@@ -75,11 +73,11 @@ class ClienteRepo:
             return False
 
     @classmethod
-    def alterarToken(cls, email: str, token: str) -> bool:
-        sql = "UPDATE cliente SET token=? WHERE email=?"
+    def inserirToken(cls, token: str) -> bool:
+        sql = "UPDATE cliente SET token=? WHERE id=1"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
-        resultado = cursor.execute(sql, (token, email))
+        resultado = cursor.execute(sql, (token,))
         if resultado.rowcount > 0:
             conexao.commit()
             conexao.close()
@@ -251,16 +249,13 @@ class ClienteRepo:
             return objeto
         else: 
             return None
+        
 
     @classmethod
-    def obterUsuarioPorToken(cls, token: str) -> Usuario:
-        sql = "SELECT id, nome, email, admin FROM cliente WHERE token=?"
+    def obterPorToken(cls, token: str) -> Cliente:
+        sql = "SELECT * FROM cliente WHERE token=?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
-        # quando se executa fechone em um cursor sem resultado, ele retorna None
         resultado = cursor.execute(sql, (token,)).fetchone()
-        if resultado:
-            objeto = Usuario(*resultado)
-            return objeto
-        else:
-            return None
+        objeto = Cliente(*resultado) if resultado else None
+        return objeto

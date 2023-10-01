@@ -2,7 +2,6 @@ import secrets
 import bcrypt
 from fastapi import Request
 from models.Usuario import Usuario
-from repositories.AlunoRepo import AlunoRepo
 
 def validar_usuario_logado(request: Request) -> Usuario | None:
     try:
