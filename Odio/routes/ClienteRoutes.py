@@ -79,7 +79,7 @@ async def postNovo(
         valores["nome"] = nome
         valores["email"] = email.lower()
         return templates.TemplateResponse(
-            "cliente/cadastro.html",
+            "/cadastro.html",
             {
                 "request": request,
                 "usuario": usuario,
@@ -100,6 +100,6 @@ async def postNovo(
 
     # mostra página de sucesso
     return templates.TemplateResponse(
-        "cliente/cadastrosucesso.html",
+        "/cadastrosucesso.html",
         {"request": request, "usuario": usuario},
     )
