@@ -76,3 +76,4 @@ class CategoriaRepo:
         resultado = cursor.execute(sql, (id, )).fetchone()
         objeto = Categoria(*resultado)
         return objeto
+    

@@ -99,3 +99,4 @@ class ProdutoRepo:
         resultado = cursor.execute(sql, (id, )).fetchone()
         objeto = Produto(*resultado)
         return objeto
+    

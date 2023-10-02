@@ -1,7 +1,7 @@
 from typing import List
 from models.Cliente import Cliente
 from util.Database import Database
-
+from models.Usuario import Usuario
 
 class ClienteRepo:
     @classmethod
@@ -259,3 +259,61 @@ class ClienteRepo:
         resultado = cursor.execute(sql, (token,)).fetchone()
         objeto = Cliente(*resultado) if resultado else None
         return objeto
+    @classmethod
+    def obterIntegrantes(cls, id: int) -> List[str]:
+        sql = "SELECT nome FROM produto WHERE idCategoria=? and aprovado=1 ORDER BY nome"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (id, )).fetchall()
+        if resultado:
+            return [x[0] for x in resultado]
+        else:
+            return []
+        
+    @classmethod
+    def alterarToken(cls, email: str, token: str) -> bool:
+        sql = "UPDATE cliente SET token=? WHERE email=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (token, email))
+        if resultado.rowcount > 0:
+            conexao.commit()
+            conexao.close()
+            return True
+        else:
+            conexao.close()
+            return False
+    @classmethod
+    def alterarAdmin(cls, id: int, admin: bool) -> bool:
+        sql = "UPDATE cliente SET admin=? WHERE id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (admin, id))
+        if resultado.rowcount > 0:
+            conexao.commit()
+            conexao.close()
+            return True
+        else:
+            conexao.close()
+            return False
+        
+    @classmethod
+    def emailExiste(cls, email: str) -> bool:
+        sql = "SELECT EXISTS (SELECT 1 FROM cliente WHERE email=?)"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (email,)).fetchone()        
+        return bool(resultado[0])
+    
+    @classmethod
+    def obterUsuarioPorToken(cls, token: str) -> Usuario:
+        sql = "SELECT id, nome, email, admin FROM cliente WHERE token=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        # quando se executa fechone em um cursor sem resultado, ele retorna None
+        resultado = cursor.execute(sql, (token,)).fetchone()
+        if resultado:
+            objeto = Usuario(*resultado)
+            return objeto
+        else:
+            return None

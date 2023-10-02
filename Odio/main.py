@@ -19,15 +19,17 @@ from routes.AdminRoutes import router as adminRouter
 from routes.CadastroRoutes import router as cadastroRouter
 from routes.FechamentoRoutes import router as fechamentoRouter
 
-app = FastAPI()
-
-
 CategoriaRepo.criarTabela()
 ProdutoRepo.criarTabela()
 ClienteRepo.criarTabela()
 AdministradorRepo.criarTabela()
 VendaRepo.criarTabela()
 ItemVendaRepo.criarTabela()
+
+app = FastAPI()
+
+
+
 
 
 app.mount(path="/static", app=StaticFiles(directory="static"), name="static")
