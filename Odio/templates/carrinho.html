@@ -6,22 +6,21 @@
             <div class="container">
                 <h1>Carrinho de Compras</h1>
                 <ul class="list-group mb-3">
-                    {% for c in carrinho%}
-                    {{c}}
+                    {% for p in produtos%}
                     <li class="list-group-item py-3">
                         <div class="row g-3">
                             <div class="col-4 col-md-3 col-lg-2">
                                 <a href="#">
-                                    <img src="/img/produtos/000008.jpg" class="img-thumbnail">
+                                    <img src="/static/img/{{p.0.imgProduto}}" class="img-thumbnail">
                                 </a>
                             </div>
                             <div class="col-8 col-md-9 col-lg-7 col-xl-8 text-left align-self-center">
                                 <h4>
                                     <b><a href="#" class="text-decoration-none text-danger">
-                                            Abacate Manteiga</a></b>
+                                            {{ p.0.nome }}</a></b>
                                 </h4>
                                 <h5>
-                                    Abacate manteiga da melhor qualidade possível e muito fresco.
+                                    {{ p.0.descricao }}
                                 </h5>
                             </div>
                             <div
@@ -30,17 +29,17 @@
                                     <button class="btn btn-outline-dark btn-sm" type="button">
                                         <i class="bi-caret-down" style="font-size: 16px; line-height: 16px;"></i>
                                     </button>
-                                    <input type="text" class="form-control text-center border-dark" value="4">
+                                    <input type="text" class="form-control text-center border-dark" value="{{p.1}}">
                                     <button class="btn btn-outline-dark btn-sm" type="button">
                                         <i class="bi-caret-up" style="font-size: 16px; line-height: 16px;"></i>
                                     </button>
-                                    <button class="btn btn-outline-danger border-dark btn-sm" type="button">
+                                    <button class="btn btn-outline-danger border-dark btn-sm btn-primary" disabled type="button">
                                         <i class="bi-trash" style="font-size: 16px; line-height: 16px;"></i>
                                     </button>
                                 </div>
                                 <div class="text-end mt-2">
-                                    <small class="text-secondary">Valor kg: R$ 3,99</small><br>
-                                    <span class="text-dark">Valor Item: R$ 15,96</span>
+                                    <small class="text-secondary">Valor unitario: {{ p.0.preco }}</small><br>
+                                    <span class="text-dark">Valor Item: {{ p.0.preco * p.1 }}</span>
                                 </div>
                             </div>
                         </div>
@@ -50,7 +49,7 @@
                     <li class="list-group-item py-3">
                         <div class="text-end">
                             <h4 class="text-dark mb-3">
-                                Valor Total: R$ 63,84
+                                Valor Total: {{valor}}
                             </h4>
                             <a href="/index.html" class="btn btn-outline-success btn-lg">
                                 Continuar Comprando                            

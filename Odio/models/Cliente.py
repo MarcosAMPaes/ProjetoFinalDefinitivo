@@ -5,7 +5,6 @@ from typing import Optional
 @dataclass
 class Cliente:
     id: int
-    idUsuario: int
     nome: str
     email: str
     senha: Optional[str] = ""

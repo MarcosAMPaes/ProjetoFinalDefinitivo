@@ -7,7 +7,7 @@ class Produto:
     id: int
     idCategoria: int
     nome: str
+    descricao: str
     estoque: str
     preco: float
-    descricao: str
     imgProduto: Optional[str] = ""

@@ -1,4 +1,5 @@
 from typing import List
+from models.Cliente import Cliente
 from util.Database import Database
 from models.ItemVenda import ItemVenda
 
@@ -45,5 +46,14 @@ class ItemVendaRepo:
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql).fetchall()
+        objetos = [ItemVenda(*x) for x in resultado]
+        return objetos
+    
+    @classmethod
+    def obterItem_VendaPorIdsVenda(cls, id_venda: int) -> List[ItemVenda]:
+        sql = "SELECT * FROM item_venda WHERE idVenda = ?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (id_venda,)).fetchall()
         objetos = [ItemVenda(*x) for x in resultado]
         return objetos

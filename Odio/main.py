@@ -10,6 +10,7 @@ from Repositories.CategoriaRepo import CategoriaRepo
 from Repositories.ClienteRepo import ClienteRepo
 from Repositories.ItemVendaRepo import ItemVendaRepo
 from Repositories.ProdutoRepo import ProdutoRepo
+from Repositories.UsuarioRepo import UsuarioRepo
 from Repositories.VendaRepo import VendaRepo
 
 
@@ -25,6 +26,7 @@ ClienteRepo.criarTabela()
 AdministradorRepo.criarTabela()
 VendaRepo.criarTabela()
 ItemVendaRepo.criarTabela()
+UsuarioRepo.criarTabela()
 
 app = FastAPI()
 

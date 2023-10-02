@@ -92,11 +92,11 @@ class ProdutoRepo:
         return int(resultado[0])
     
     @classmethod
-    def obterPorId(cls, id: int) -> Produto:
-        sql = "SELECT id, nome, descricao FROM produto WHERE id=?"
+    def obterPorProdutosPorId(cls, id: int) -> List[Produto]:
+        sql = "SELECT id, idCategoria, nome, descricao, estoque, preco, imgProduto FROM produto WHERE id=?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
-        resultado = cursor.execute(sql, (id, )).fetchone()
-        objeto = Produto(*resultado)
-        return objeto
+        resultado = cursor.execute(sql, (id,)).fetchall()
+        objetos = [Produto(*x) for x in resultado]
+        return objetos
     

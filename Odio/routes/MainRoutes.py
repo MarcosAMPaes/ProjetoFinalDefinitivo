@@ -1,6 +1,6 @@
 # routes/MainRoutes.py
 from datetime import datetime
-from fastapi import APIRouter, Depends, Form, Query, Request, status, FastAPI
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, status, FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -9,6 +9,7 @@ from Repositories.ItemVendaRepo import ItemVendaRepo
 from Repositories.ProdutoRepo import ProdutoRepo
 from Repositories.CategoriaRepo import CategoriaRepo
 from Repositories.VendaRepo import VendaRepo
+from models.Cliente import Cliente
 from models.ItemVenda import ItemVenda
 from models.Venda import Venda
 from util.security import gerar_token, validar_usuario_logado
@@ -42,19 +43,17 @@ async def getIndex(request: Request):
 async def postProdutoCarrinho(request: Request,
     produto_id: int = Form(...),
     produto_preco: float = Form(...)):
-    
-    status = 0
-    token = gerar_token()
-    ClienteRepo.inserirToken(token)
-    idCliente = ClienteRepo.obterPorToken(token).id
-    dataHora = datetime.now()
-    novaVenda = Venda(id=0, idCliente=idCliente, dataHora=dataHora, status=status, valorTotal=produto_preco)
-    VendaRepo.inserir(novaVenda)
-    novoItemVenda = ItemVenda(id=0, idVenda = novaVenda.id, idProduto=produto_id, quantidade=1, subtotal=produto_preco)
-    ItemVendaRepo.inserir(novoItemVenda)
-    response = RedirectResponse('/carrinho', status_code=302)
-    response.set_cookie(key="auth_token", value=token, max_age=1800, httponly=True)
-    return response
+    try:
+        token = request.cookies.values().mapping["auth_token"]
+        idCliente = ClienteRepo.obterPorToken(token).id
+        dataHora = datetime.now()
+        novaVenda = Venda(0, idCliente=idCliente, dataHora=dataHora, status=0, valorTotal=produto_preco)
+        VendaRepo.inserir(novaVenda)
+        novoItemVenda = ItemVenda(id=0, idVenda = novaVenda.id, idProduto=produto_id, quantidade=1, subtotal=produto_preco)
+        ItemVendaRepo.inserir(novoItemVenda)
+        return RedirectResponse('/carrinho', status_code=status.HTTP_302_FOUND)
+    except KeyError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token de autenticação ausente ou inválido")
 
 
 
@@ -118,9 +117,6 @@ async def root(request: Request):
 async def root(request: Request):
     return templates.TemplateResponse("fechamento_pagamento.html", {"request": request,})
 
-@router.get('/login', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request,})
 
 @router.get('/privacidade', response_class=HTMLResponse)
 async def root(request: Request):
@@ -156,16 +152,16 @@ async def getIndex(
     for categoria in categoria:
         categoria.integrantes = CategoriaRepo.obterProdutos(categoria.id)
     return templates.TemplateResponse(
-        "main/index.html", {"request": request, "usuario": usuario, "categoria": categoria}
+        "index.html", {"request": request, "usuario": usuario, "categoria": categoria}
     )
 
 
 @router.get("/login")
 async def getLogin(
-    request: Request, usuario: Usuario = Depends(validar_usuario_logado)
+    request: Request, cliente: Cliente = Depends(validar_usuario_logado)
 ):
     return templates.TemplateResponse(
-        "main/login.html", {"request": request, "usuario": usuario}
+        "login.html", {"request": request, "cliente": cliente}
     )
 
 
@@ -190,32 +186,33 @@ async def postLogin(
     is_not_empty(senha, "senha", erros)
         
     # só checa a senha no BD se os dados forem válidos
-    if len(erros) == 0:
-        hash_senha_bd = ClienteRepo.obterSenhaDeEmail(email)
-        if hash_senha_bd:
-            if verificar_senha(senha, hash_senha_bd):
-                token = gerar_token()
-                if ClienteRepo.alterarToken(email, token):
-                    response = RedirectResponse(returnUrl, status.HTTP_302_FOUND)
-                    response.set_cookie(
-                        key="auth_token", value=token, max_age=1800, httponly=True
-                    )
-                    return response
-                else:
-                    raise Exception(
-                        "Não foi possível alterar o token do usuário no banco de dados."
-                    )
-            else:            
-                add_error("senha", "Senha não confere.", erros)
-        else:
-            add_error("email", "Usuário não cadastrado.", erros)
+    hash_senha_bd = ClienteRepo.obterSenhaDeEmail(email)
+    if hash_senha_bd:
+        print(senha)
+        print(verificar_senha(senha, hash_senha_bd))
+        if verificar_senha(senha, hash_senha_bd):
+            token = gerar_token()
+            if ClienteRepo.alterarToken(email, token):
+                response = RedirectResponse('/', status.HTTP_302_FOUND)
+                response.set_cookie(
+                    key="auth_token", value=token, max_age=1800, httponly=True
+                )
+                return response
+            else:
+                raise Exception(
+                    "Não foi possível alterar o token do usuário no banco de dados."
+                )
+        else:            
+            add_error("senha", "Senha não confere.", erros)
+    else:
+        add_error("email", "Usuário não cadastrado.", erros)
 
     # se tem algum erro, mostra o formulário novamente
     if len(erros) > 0:
         valores = {}
         valores["email"] = email        
         return templates.TemplateResponse(
-            "main/login.html",
+            "login.html",
             {
                 "request": request,
                 "usuario": usuario,

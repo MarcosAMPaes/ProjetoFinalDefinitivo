@@ -1,7 +1,6 @@
 from typing import List
 from models.Cliente import Cliente
 from util.Database import Database
-from models.Usuario import Usuario
 
 class ClienteRepo:
     @classmethod
@@ -9,7 +8,6 @@ class ClienteRepo:
         sql = """
             CREATE TABLE IF NOT EXISTS cliente(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            idUsuario INTEGER,
             nome TEXT NOT NULL,
             email TEXT NOT NULL,
             senha TEXT NOT NULL,
@@ -18,8 +16,7 @@ class ClienteRepo:
             cep TEXT,
             token TEXT,
             admin BOOLEAN NOT NULL DEFAULT 0,
-            UNIQUE (email),
-            FOREIGN KEY(idUsuario) REFERENCES usuario(id))
+            UNIQUE (email))
         """
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
@@ -32,11 +29,11 @@ class ClienteRepo:
 
     @classmethod
     def inserir(cls, cliente: Cliente) -> Cliente:
-        sql = "INSERT INTO cliente (nome, email, senha, telefone, endLogradouro, endNumero, cep, token, idUsuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        sql = "INSERT INTO cliente (nome, email, senha, telefone, endNumero, cep, token) VALUES (?, ?, ?, ?, ?, ?, ?)"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(
-            sql, (cliente.nome, cliente.email, cliente.senha, cliente.telefone, cliente.endLogradouro, cliente.endNumero, cliente.cep, cliente.token, cliente.idUsuario)
+            sql, (cliente.nome, cliente.email, cliente.senha, cliente.telefone, cliente.endNumero, cliente.cep, cliente.token)
         )
         if resultado.rowcount > 0:
             cliente.id = resultado.lastrowid
@@ -46,10 +43,10 @@ class ClienteRepo:
 
     @classmethod
     def alterar(cls, cliente: Cliente) -> Cliente:
-        sql = "UPDATE cliente SET nome=?, cliente.email=?, telefone=?, endLogradouro=?, endNumero=?, cep=?, idUsuario=? WHERE id=?"
+        sql = "UPDATE cliente SET nome=?, cliente.email=?, telefone=?, endNumero=?, cep=? WHERE id=?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
-        resultado = cursor.execute(sql, (cliente.nome, cliente.email, cliente.telefone,cliente.endLogradouro,cliente.endNumero, cliente.cep, cliente.id))
+        resultado = cursor.execute(sql, (cliente.nome, cliente.email, cliente.telefone,cliente.endNumero, cliente.cep, cliente.id))
         if resultado.rowcount > 0:
             conexao.commit()
             conexao.close()
@@ -306,14 +303,13 @@ class ClienteRepo:
         return bool(resultado[0])
     
     @classmethod
-    def obterUsuarioPorToken(cls, token: str) -> Usuario:
+    def obterClientePorToken(cls, token: str) -> Cliente:
         sql = "SELECT id, nome, email, admin FROM cliente WHERE token=?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
-        # quando se executa fechone em um cursor sem resultado, ele retorna None
         resultado = cursor.execute(sql, (token,)).fetchone()
         if resultado:
-            objeto = Usuario(*resultado)
+            objeto = Cliente(*resultado)
             return objeto
         else:
             return None
