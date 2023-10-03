@@ -37,7 +37,12 @@ async def startup_event():
 @router.get("/", response_class=HTMLResponse)
 async def getIndex(request: Request):
     produtos = ProdutoRepo.obterTodos()
-    print(produtos)
+    categorias = CategoriaRepo.obterTodos()
+    return templates.TemplateResponse("index.html", { "request": request, "produtos": produtos, "categorias": categorias})
+
+@router.get("/PorCategoria", response_class=HTMLResponse)
+async def getIndexCategoria(request: Request, idCategoria: int=Query(...)):
+    produtos = ProdutoRepo.obterProdutosCategoria(idCategoria)
     return templates.TemplateResponse("index.html", { "request": request, "produtos": produtos })
 
 @router.post("/")

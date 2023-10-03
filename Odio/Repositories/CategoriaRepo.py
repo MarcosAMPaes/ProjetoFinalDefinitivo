@@ -60,7 +60,7 @@ class CategoriaRepo:
         
     @classmethod
     def obterTodos(cls) -> List[Categoria]:
-        sql = "SELECT nome FROM categoria ORDER BY nome"
+        sql = "SELECT id, nome FROM categoria ORDER BY nome"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql).fetchall()

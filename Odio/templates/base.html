@@ -20,6 +20,18 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/css/FoundTech.css') }}">  
 
     <title> FoundTech </title>
+    <style>.btn-danger{
+        
+        background-color:rgb(123, 207, 179);
+        border: solid black 3px;
+        text-decoration: black;
+    }
+    .btn-danger:hover{
+        background-color:rgb(139, 180, 167);
+        border: solid black 3px;
+        
+    }
+        </style>
 </head>
 
 <body>
@@ -34,11 +46,12 @@
                 <div class="collapse navbar-collapse">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="/index">Principal</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-white" href="/contato">Contato</a>
                         </li>
+                        <li class="nav-item d-none">
+                            <a class="nav-link text-white" href="/index">Principal</a>
+                        </li>
+                        
                     </ul>
                     <div class="align-self-end">
                         <ul class="navbar-nav">
@@ -60,6 +73,7 @@
                 </div>
             </div>
         </nav>
+    
   {% block conteudo %}
 
 
