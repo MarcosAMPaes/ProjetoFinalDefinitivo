@@ -1,10 +1,13 @@
+from datetime import datetime
 from Repositories.ItemVendaRepo import ItemVendaRepo
 from Repositories.ProdutoRepo import ProdutoRepo
 from Repositories.VendaRepo import VendaRepo
+from models.ItemVenda import ItemVenda
+from models.Venda import Venda
 from util.security import gerar_token, validar_usuario_logado
 from util.templateFilters import formatarData
 # routes/ProjetoRoutes.py
-from fastapi import APIRouter, Depends, Form, Path, HTTPException, Request, status, FastAPI
+from fastapi import APIRouter, Depends, Form, Path, HTTPException, Query, Request, status, FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -38,8 +41,7 @@ async def root(request: Request):
         carrinho.extend(ItemVendaRepo.obterItem_VendaPorIdsVenda(venda.id))
     produtos = []
     for item_venda in carrinho:
-        produtos.extend(ProdutoRepo.obterPorProdutosPorId(item_venda.idProduto))
-        print(produtos)
+        produtos.extend(ProdutoRepo.obterProdutosPorId(item_venda.idProduto))
     contagem_produtos = defaultdict(int)
     for produto in produtos:
         contagem_produtos[produto.id] += 1
@@ -52,6 +54,41 @@ async def root(request: Request):
     for produto in produtosUnicos:
         valorTotal += produto[0].preco*produto[1]
     return templates.TemplateResponse("carrinho.html", {"request": request, 'produtos': produtosUnicos, 'valor': valorTotal})
+
+
+@router.post('/itemMais1')
+async def postItemMais1(request: Request, idProduto: int=Query(...)):
+    token = request.cookies.values().mapping["auth_token"]
+    idCliente = ClienteRepo.obterPorToken(token).id
+    dataHora = datetime.now()
+    produto = ProdutoRepo.obterProdutosPorId(idProduto)
+    novaVenda = Venda(0, idCliente=idCliente, dataHora=dataHora, status=0, valorTotal=produto[0].preco)
+    VendaRepo.inserir(novaVenda)
+    novoItemVenda = ItemVenda(id=0, idVenda = novaVenda.id, idProduto=idProduto, quantidade=1, subtotal=produto[0].preco)
+    ItemVendaRepo.inserir(novoItemVenda)
+    print(idProduto)
+    return RedirectResponse('/carrinho',status_code=status.HTTP_302_FOUND)
+
+@router.post('/itemMenos1')
+async def postItemMenos1(request: Request):
+    token = request.cookies.values().mapping["auth_token"]
+    idCliente = ClienteRepo.obterPorToken(token).id
+    vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente)
+    ItemVendaRepo.apagarPorIdVenda(vendasDoCliente[-1].id)
+    VendaRepo.excluirUmaVenda(vendasDoCliente[-1].id)
+
+    return RedirectResponse('/carrinho',status_code=status.HTTP_302_FOUND)
+
+@router.post('/apagarItem')
+async def postItemMenos1(request: Request):
+    token = request.cookies.values().mapping["auth_token"]
+    idCliente = ClienteRepo.obterPorToken(token).id
+    vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente)
+    ItemVendaRepo.apagarPorIdVenda(vendasDoCliente[-1].id)
+    VendaRepo.excluirUmaVenda(vendasDoCliente[-1].id)
+
+    return RedirectResponse('/carrinho',status_code=status.HTTP_302_FOUND)
+
 
 @router.get('/cadastrarnovasenha', response_class=HTMLResponse)
 async def root(request: Request):

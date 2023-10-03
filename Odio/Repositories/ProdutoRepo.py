@@ -66,7 +66,7 @@ class ProdutoRepo:
         
     @classmethod
     def obterTodos(cls) -> List[Produto]:
-        sql = "SELECT id, idCategoria, nome, estoque, preco, descricao, imgProduto FROM produto ORDER BY nome"
+        sql = "SELECT id, idCategoria, nome, descricao, estoque, preco, imgProduto FROM produto ORDER BY nome"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql).fetchall()
@@ -92,7 +92,7 @@ class ProdutoRepo:
         return int(resultado[0])
     
     @classmethod
-    def obterPorProdutosPorId(cls, id: int) -> List[Produto]:
+    def obterProdutosPorId(cls, id: int) -> List[Produto]:
         sql = "SELECT id, idCategoria, nome, descricao, estoque, preco, imgProduto FROM produto WHERE id=?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()

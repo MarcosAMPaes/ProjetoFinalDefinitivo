@@ -57,3 +57,14 @@ class ItemVendaRepo:
         resultado = cursor.execute(sql, (id_venda,)).fetchall()
         objetos = [ItemVenda(*x) for x in resultado]
         return objetos
+    
+    
+    @classmethod
+    def apagarPorIdVenda(cls, idVenda: int) -> ItemVenda:
+        sql = "DELETE FROM item_venda WHERE idVenda=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        cursor.execute(sql, (idVenda,))
+        conexao.commit()
+        conexao.close()
+        return True

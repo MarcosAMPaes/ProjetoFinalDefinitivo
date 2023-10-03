@@ -45,3 +45,13 @@ class VendaRepo:
         resultado = cursor.execute(sql,(idCliente,)).fetchall()
         objetos = [Venda(*x) for x in resultado]
         return objetos
+    
+    @classmethod
+    def excluirUmaVenda(cls, idVenda: int) -> Venda:
+        sql = "DELETE FROM venda WHERE id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        cursor.execute(sql, (idVenda,))
+        conexao.commit()
+        conexao.close()
+        return True

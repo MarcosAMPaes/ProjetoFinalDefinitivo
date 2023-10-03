@@ -37,6 +37,7 @@ async def startup_event():
 @router.get("/", response_class=HTMLResponse)
 async def getIndex(request: Request):
     produtos = ProdutoRepo.obterTodos()
+    print(produtos)
     return templates.TemplateResponse("index.html", { "request": request, "produtos": produtos })
 
 @router.post("/")
@@ -53,7 +54,7 @@ async def postProdutoCarrinho(request: Request,
         ItemVendaRepo.inserir(novoItemVenda)
         return RedirectResponse('/carrinho', status_code=status.HTTP_302_FOUND)
     except KeyError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token de autenticação ausente ou inválido")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Token de autenticação ausente ou inválido. Por favor, faça o login novamente.")
 
 
 
