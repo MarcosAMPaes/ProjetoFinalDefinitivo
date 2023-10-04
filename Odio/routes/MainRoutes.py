@@ -42,10 +42,18 @@ async def getIndex(request: Request,pa: int = 1,tp: int = 10):
     filtro = False
     numProdutos = ProdutoRepo.obterPagina(pa, tp)
     totalPaginas = ProdutoRepo.obterQtdePaginas(tp)
+    cliente = validar_usuario_logado(request)
     return templates.TemplateResponse("index.html",{ "request": request, "produtos": produtos, "categorias": categorias, 'filtro': filtro ,"numProdutos":numProdutos,
     "totalPaginas": totalPaginas,
     "paginaAtual": pa,
-    "tamanhoPagina": tp})
+    "tamanhoPagina": tp,
+    'cliente': cliente})
+
+@router.get("/base", response_class=HTMLResponse)
+async def getIndex(request: Request):
+    cliente = validar_usuario_logado(request)
+    print(cliente)
+    return templates.TemplateResponse("base.html",{ "request": request,'cliente': cliente})
 
 @router.get("/PorCategoria", response_class=HTMLResponse)
 async def getIndexCategoria(request: Request, idCategoria: int=Query(...), pa: int = 1,tp: int = 10):
@@ -63,13 +71,16 @@ async def postProdutoCarrinho(request: Request,
     produto_preco: float = Form(...)):
     try:
         token = request.cookies.values().mapping["auth_token"]
-        idCliente = ClienteRepo.obterPorToken(token).id
-        dataHora = datetime.now()
-        novaVenda = Venda(0, idCliente=idCliente, dataHora=dataHora, status=0, valorTotal=produto_preco)
-        VendaRepo.inserir(novaVenda)
-        novoItemVenda = ItemVenda(id=0, idVenda = novaVenda.id, idProduto=produto_id, quantidade=1, subtotal=produto_preco)
-        ItemVendaRepo.inserir(novoItemVenda)
-        return RedirectResponse('/carrinho', status_code=status.HTTP_302_FOUND)
+        if (token !=""):
+            idCliente = ClienteRepo.obterPorToken(token).id
+            dataHora = datetime.now()
+            novaVenda = Venda(0, idCliente=idCliente, dataHora=dataHora, status=0, valorTotal=produto_preco)
+            VendaRepo.inserir(novaVenda)
+            novoItemVenda = ItemVenda(id=0, idVenda = novaVenda.id, idProduto=produto_id, quantidade=1, subtotal=produto_preco)
+            ItemVendaRepo.inserir(novoItemVenda)
+            return RedirectResponse('/carrinho', status_code=status.HTTP_302_FOUND)
+        else:
+            return RedirectResponse('/login', status_code=status.HTTP_302_FOUND)
     except KeyError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Token de autenticação ausente ou inválido. Por favor, faça o login novamente.")
 

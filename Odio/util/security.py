@@ -9,11 +9,11 @@ def validar_usuario_logado(request: Request) -> Cliente | None:
     try:
         token = request.cookies["auth_token"]
         if token.strip() == "":
-            return None
+            return False
         cliente = ClienteRepo.obterClientePorToken(token)
         return cliente
     except KeyError:
-        return None    
+        return False   
 
 def obter_hash_senha(senha: str) -> str:
     # A função bcrypt.hashpw espera que a senha seja em bytes, por isso usamos .encode()

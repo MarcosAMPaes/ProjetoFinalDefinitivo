@@ -32,28 +32,34 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get('/carrinho', response_class=HTMLResponse)
-async def root(request: Request):
-    token = request.cookies.values().mapping["auth_token"]
-    idCliente = ClienteRepo.obterPorToken(token)
-    vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente.id)
-    carrinho = []
-    for venda in vendasDoCliente:
-        carrinho.extend(ItemVendaRepo.obterItem_VendaPorIdsVenda(venda.id))
-    produtos = []
-    for item_venda in carrinho:
-        produtos.extend(ProdutoRepo.obterProdutosPorId(item_venda.idProduto))
-    contagem_produtos = defaultdict(int)
-    for produto in produtos:
-        contagem_produtos[produto.id] += 1
-    produtosUnicos = []
-    valorTotal = 0
-    for produto in produtos:
-        if contagem_produtos[produto.id] > 0:
-            produtosUnicos.append((produto, contagem_produtos[produto.id]))
-            contagem_produtos[produto.id] = 0
-    for produto in produtosUnicos:
-        valorTotal += produto[0].preco*produto[1]
-    return templates.TemplateResponse("carrinho.html", {"request": request, 'produtos': produtosUnicos, 'valor': valorTotal})
+async def root(request: Request, usuario: Usuario = Depends(validar_usuario_logado)):
+    if usuario:
+        if usuario.admin:
+            return RedirectResponse('/adm',status_code=status.HTTP_302_FOUND)
+        else:
+            token = request.cookies.values().mapping["auth_token"]
+            idCliente = ClienteRepo.obterPorToken(token)
+            vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente.id)
+            carrinho = []
+            for venda in vendasDoCliente:
+                carrinho.extend(ItemVendaRepo.obterItem_VendaPorIdsVenda(venda.id))
+            produtos = []
+            for item_venda in carrinho:
+                produtos.extend(ProdutoRepo.obterProdutosPorId(item_venda.idProduto))
+            contagem_produtos = defaultdict(int)
+            for produto in produtos:
+                contagem_produtos[produto.id] += 1
+            produtosUnicos = []
+            valorTotal = 0
+            for produto in produtos:
+                if contagem_produtos[produto.id] > 0:
+                    produtosUnicos.append((produto, contagem_produtos[produto.id]))
+                    contagem_produtos[produto.id] = 0
+            for produto in produtosUnicos:
+                valorTotal += produto[0].preco*produto[1]
+            return templates.TemplateResponse("carrinho.html", {"request": request, 'produtos': produtosUnicos, 'valor': valorTotal})
+    else:
+        return RedirectResponse('/login',status_code=status.HTTP_302_FOUND)
 
 
 @router.post('/itemMais1')
@@ -176,5 +182,11 @@ async def root(request: Request):
     return templates.TemplateResponse("cliente_senha.html", {"request": request,})
 
 @router.get('/cliente', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("cliente.html", {"request": request,})
+async def getCliente(request: Request, usuario: Usuario = Depends(validar_usuario_logado)):
+     if usuario:
+        if usuario.admin:
+            return RedirectResponse('/adm',status_code=status.HTTP_302_FOUND)
+        else:  
+            return templates.TemplateResponse("cliente.html", {"request": request,})
+     else:
+         return RedirectResponse('/login',status_code=status.HTTP_302_FOUND)
