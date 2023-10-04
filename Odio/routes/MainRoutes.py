@@ -1,4 +1,5 @@
 # routes/MainRoutes.py
+from collections import defaultdict
 from datetime import datetime
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, status, FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -35,15 +36,26 @@ async def startup_event():
     templates.env.filters["date"] = formatarData
 
 @router.get("/", response_class=HTMLResponse)
-async def getIndex(request: Request):
+async def getIndex(request: Request,pa: int = 1,tp: int = 10):
     produtos = ProdutoRepo.obterTodos()
     categorias = CategoriaRepo.obterTodos()
-    return templates.TemplateResponse("index.html", { "request": request, "produtos": produtos, "categorias": categorias})
+    filtro = False
+    numProdutos = ProdutoRepo.obterPagina(pa, tp)
+    totalPaginas = ProdutoRepo.obterQtdePaginas(tp)
+    return templates.TemplateResponse("index.html",{ "request": request, "produtos": produtos, "categorias": categorias, 'filtro': filtro ,"numProdutos":numProdutos,
+    "totalPaginas": totalPaginas,
+    "paginaAtual": pa,
+    "tamanhoPagina": tp})
 
 @router.get("/PorCategoria", response_class=HTMLResponse)
-async def getIndexCategoria(request: Request, idCategoria: int=Query(...)):
+async def getIndexCategoria(request: Request, idCategoria: int=Query(...), pa: int = 1,tp: int = 10):
     produtos = ProdutoRepo.obterProdutosCategoria(idCategoria)
-    return templates.TemplateResponse("index.html", { "request": request, "produtos": produtos })
+    filtro = True
+    totalPaginas = ProdutoRepo.obterQtdePaginas(tp)
+    return templates.TemplateResponse("index.html", { "request": request, "produtos": produtos, 'filtro': filtro ,"projetos":produtos,
+    "totalPaginas": totalPaginas,
+    "paginaAtual": pa,
+    "tamanhoPagina": tp})
 
 @router.post("/")
 async def postProdutoCarrinho(request: Request,
@@ -60,7 +72,6 @@ async def postProdutoCarrinho(request: Request,
         return RedirectResponse('/carrinho', status_code=status.HTTP_302_FOUND)
     except KeyError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Token de autenticação ausente ou inválido. Por favor, faça o login novamente.")
-
 
 
 
@@ -83,11 +94,34 @@ async def root(request: Request):
 
 @router.get('/fechamento_endereco', response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("fechamento_endereco.html", {"request": request,})
+    token = request.cookies.values().mapping["auth_token"]
+    enderecoCliente = ClienteRepo.obterClientePorToken(token)
+    enderecoNumero = ClienteRepo.obterClientePorToken(token)
+    return templates.TemplateResponse("fechamento_endereco.html", {"request": request, 'enderecoCliente': enderecoCliente.cep, "enderecoNumero": enderecoNumero.endNumero})
 
 @router.get('/fechamento_itens', response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("fechamento_itens.html", {"request": request,})
+    token = request.cookies.values().mapping["auth_token"]
+    idCliente = ClienteRepo.obterPorToken(token)
+    vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente.id)
+    carrinho = []
+    for venda in vendasDoCliente:
+        carrinho.extend(ItemVendaRepo.obterItem_VendaPorIdsVenda(venda.id))
+    produtos = []
+    for item_venda in carrinho:
+        produtos.extend(ProdutoRepo.obterProdutosPorId(item_venda.idProduto))
+    contagem_produtos = defaultdict(int)
+    for produto in produtos:
+        contagem_produtos[produto.id] += 1
+    produtosUnicos = []
+    valorTotal = 0
+    for produto in produtos:
+        if contagem_produtos[produto.id] > 0:
+            produtosUnicos.append((produto, contagem_produtos[produto.id]))
+            contagem_produtos[produto.id] = 0
+    for produto in produtosUnicos:
+        valorTotal += produto[0].preco*produto[1]
+    return templates.TemplateResponse("fechamento_itens.html", {"request": request, 'produtos': produtosUnicos, 'valor': valorTotal})
 
 @router.get('/fechamento_pedido', response_class=HTMLResponse)
 async def root(request: Request):
@@ -95,7 +129,55 @@ async def root(request: Request):
 
 @router.get('/fechamento_pagamento', response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("fechamento_pagamento.html", {"request": request,})
+    token = request.cookies.values().mapping["auth_token"]
+    idCliente = ClienteRepo.obterPorToken(token)
+    vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente.id)
+    carrinho = []
+    for venda in vendasDoCliente:
+        carrinho.extend(ItemVendaRepo.obterItem_VendaPorIdsVenda(venda.id))
+    produtos = []
+    for item_venda in carrinho:
+        produtos.extend(ProdutoRepo.obterProdutosPorId(item_venda.idProduto))
+    contagem_produtos = defaultdict(int)
+    for produto in produtos:
+        contagem_produtos[produto.id] += 1
+    produtosUnicos = []
+    valorTotal = 0
+    for produto in produtos:
+        if contagem_produtos[produto.id] > 0:
+            produtosUnicos.append((produto, contagem_produtos[produto.id]))
+            contagem_produtos[produto.id] = 0
+    for produto in produtosUnicos:
+        valorTotal += produto[0].preco*produto[1]
+    return templates.TemplateResponse("fechamento_pagamento.html", {"request": request, 'valorTotal':valorTotal})
+
+@router.post('/quitarVendas', response_class=HTMLResponse)
+async def root(request: Request):
+    print(2)
+    token = request.cookies.values().mapping["auth_token"]
+    idCliente = ClienteRepo.obterPorToken(token)
+    vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente.id)
+    carrinho = []
+    for venda in vendasDoCliente:
+        carrinho.extend(ItemVendaRepo.obterItem_VendaPorIdsVenda(venda.id))
+    for itemVenda in carrinho:
+        VendaRepo.quitarVenda(itemVenda.idVenda)
+    produtos = []
+    for item_venda in carrinho:
+        produtos.extend(ProdutoRepo.obterProdutosPorId(item_venda.idProduto))
+    contagem_produtos = defaultdict(int)
+    for produto in produtos:
+        contagem_produtos[produto.id] += 1
+    produtosUnicos = []
+    valorTotal = 0
+    for produto in produtos:
+        if contagem_produtos[produto.id] > 0:
+            produtosUnicos.append((produto, contagem_produtos[produto.id]))
+            contagem_produtos[produto.id] = 0
+    for produto in produtosUnicos:
+        valorTotal += produto[0].preco*produto[1]
+        ProdutoRepo.excluirDoEstoque(produto[0].id,produto[1])
+    return RedirectResponse('/carrinho', status_code=status.HTTP_302_FOUND)
 
 
 @router.get('/privacidade', response_class=HTMLResponse)
@@ -103,8 +185,9 @@ async def root(request: Request):
     return templates.TemplateResponse("privacidade.html", {"request": request,})
 
 @router.get('/produto', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("produto.html", {"request": request,})
+async def root(request: Request, id: int = Query(...)):
+    produto = ProdutoRepo.obterProdutosPorId(id)
+    return templates.TemplateResponse("produto.html", {"request": request, 'produto': produto[0]})
 
 @router.get('/quemsomos', response_class=HTMLResponse)
 async def root(request: Request):

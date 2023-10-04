@@ -23,7 +23,7 @@ class CategoriaRepo:
         sql = "INSERT INTO categoria (nome) VALUES (?)"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
-        resultado = cursor.execute(sql, (categoria.nome))
+        resultado = cursor.execute(sql, (categoria.nome,))
         if (resultado.rowcount > 0):            
             categoria.id = resultado.lastrowid
         conexao.commit()

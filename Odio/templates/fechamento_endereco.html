@@ -1,57 +1,39 @@
 {% extends "base.html" %}
 {% block conteudo %}
 
-        <main class="flex-fill">
-            <div class="container">
-                <h1>Selecione o Endereço de Entrega</h1>
-                <h3 class="mb-4">
-                    Selecione o endereço de entrega e clique em <b>Continuar</b> para prosseguir para a <b>seleção da
-                        forma de pagamento</b>.
-                </h3>
-                <div class="d-flex justify-content-around flex-wrap border rounded-top pt-4 px-3">
-                    <div class="mb-4 mx-2 flex-even">
-                        <input type="radio" class="btn-check" name="endereco" 
-                            autocomplete="off" id="end1">
-                        <label class="btn btn-outline-danger p-4 h-100 w-100" for="end1">
-                            <h3>
-                                <b class="text-dark">Minha Casa</b><br>
-                                <hr>
-                                <b>Lucio Eduardo</b><br>
-                                Rua joao alvino, 101<br>
-                                Atilio/ES<br>
-                                CEP 01.010-101
-                            </h3>
-                        </label>
-                    </div>
-                    <div class="mb-4 mx-2 flex-even">
-                        <input type="radio" class="btn-check" name="endereco" 
-                            autocomplete="off" id="end2">
-                        <label class="btn btn-outline-danger p-4 h-100 w-100" for="end2">
-                            <h3>
-                                <b class="text-dark">Meu Trabalho</b><br>
-                                <hr>
-                                <b>Lucio Eduardo</b><br>
-                                Rua joao alvino, 101<br>
-                                Atilio/ES<br>
-                                CEP 01.010-101
-                            </h3>
-                        </label>
-                    </div>
-                    <div class="mb-4 mx-2 flex-even">
-                        <input type="radio" class="btn-check" name="endereco" 
-                            autocomplete="off" id="end3">
-                        <label class="btn btn-outline-danger p-4 h-100 w-100" for="end3">
-                            <h3>
-                                <b class="text-dark">Casa de Praia</b><br>
-                                <hr>
-                                <b>Lucio Eduardo</b><br>
-                                Rua joao alvino, 101<br>
-                                Atilio/ES<br>
-                                CEP 01.010-101
-                            </h3>
-                        </label>
-                    </div>
-                </div>
+<main class="flex-fill">
+    <div class="container">
+        <h1>Selecione o Endereço de Entrega</h1>
+        <h3 class="mb-4">
+            Selecione o endereço de entrega e clique em <b>Continuar</b> para prosseguir para a <b>seleção da
+                forma de pagamento</b>.
+        </h3>
+
+        {% if enderecoCliente != None %}
+        <div class="d-flex justify-content-around flex-wrap border rounded-top pt-4 px-3">
+            <div class="mb-4 mx-2 flex-even">
+                <input type="radio" class="btn-check" name="endereco" 
+                    autocomplete="off" id="end1">
+                <label class="btn btn-outline-danger p-4 h-100 w-100" for="end1">
+                    <h3>
+                        <b class="text-dark">Minha Casa</b><br>
+                        <hr>
+                        <b>Lucio Eduardo</b><br>
+                        Rua João Alvino, {{enderecoNumero}}<br>
+                        Atilio/ES<br>
+                        {{enderecoCliente[:5] + "-" + enderecoCliente[5:]}}
+                    </h3>
+                </label>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center mt-4">
+            <p> Parece que você ainda não possui endereço cadastrado. Registre um:</p>
+            <a href="/cliente_endereco" class="btn btn-primary">Registrar Endereço</a>
+        </div>
+        {% endif %}
+    </div>
+</main>
                 <div class="text-end border border-top-0 rounded-bottom p-4 pb-0">                    
                     <a href="/fechamento_itens" class="btn btn-outline-success btn-lg mb-4">
                         Voltar aos Itens

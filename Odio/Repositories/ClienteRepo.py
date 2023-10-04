@@ -304,7 +304,7 @@ class ClienteRepo:
     
     @classmethod
     def obterClientePorToken(cls, token: str) -> Cliente:
-        sql = "SELECT id, nome, email, admin FROM cliente WHERE token=?"
+        sql = "SELECT id, nome, email, senha, telefone, endNumero, cep, token, admin FROM cliente WHERE token=?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql, (token,)).fetchone()
@@ -313,3 +313,14 @@ class ClienteRepo:
             return objeto
         else:
             return None
+        
+
+    @classmethod
+    def inserirPorToken(cls, token: str, cep: str, endNumero: str) -> Cliente:
+        sql = "UPDATE cliente SET cep=?, endNumero=? WHERE token=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (cep, endNumero, token))
+        conexao.commit()
+        conexao.close()
+        return resultado.rowcount > 0

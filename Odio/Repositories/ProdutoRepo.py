@@ -26,10 +26,10 @@ class ProdutoRepo:
     
     @classmethod
     def inserir(cls, produto: Produto) -> Produto:        
-        sql = "INSERT INTO produto (nome, estoque, preco, descricao) VALUES (?, ?, ?, ?)"
+        sql = "INSERT INTO produto (idCategoria, nome, descricao, estoque, preco, imgProduto) VALUES (?, ?, ?, ?, ?, ?)"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
-        resultado = cursor.execute(sql, (produto.nome, produto.estoque, produto.preco, produto.descricao))
+        resultado = cursor.execute(sql, (produto.idCategoria, produto.nome, produto.descricao, produto.estoque, produto.preco, produto.imgProduto))
         if (resultado.rowcount > 0):            
             produto.id = resultado.lastrowid
         conexao.commit()
@@ -66,7 +66,7 @@ class ProdutoRepo:
         
     @classmethod
     def obterTodos(cls) -> List[Produto]:
-        sql = "SELECT id, idCategoria, nome, descricao, estoque, preco, imgProduto FROM produto ORDER BY nome"
+        sql = "SELECT id, idCategoria, nome, descricao, estoque, preco, imgProduto FROM produto WHERE estoque != 0 ORDER BY nome"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql).fetchall()
@@ -76,13 +76,13 @@ class ProdutoRepo:
     @classmethod
     def obterPagina(cls, pagina: int, tamanhoPagina: int) -> List[Produto]:
         inicio = (pagina - 1) * tamanhoPagina
-        sql = "SELECT nome, estoque, preco, descricao FROM produto ORDER BY nome LIMIT ?, ?"
+        sql = "SELECT id, idCategoria, nome, descricao, estoque, preco, imgProduto FROM produto ORDER BY nome LIMIT ?, ?"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql, (inicio, tamanhoPagina)).fetchall()
         objetos = [Produto(*x) for x in resultado]
         return objetos
-    
+
     @classmethod
     def obterQtdePaginas(cls, tamanhoPagina: int) -> int:
         sql = "SELECT CEIL(CAST((SELECT COUNT(*) FROM produto) AS FLOAT) / ?) AS qtdePaginas"
@@ -109,3 +109,13 @@ class ProdutoRepo:
         objetos = [Produto(*x) for x in resultado]
         return objetos
     
+
+    @classmethod
+    def excluirDoEstoque(cls, id: int, contagem:int) -> Produto:
+        sql = "UPDATE produto SET estoque = estoque - ? WHERE id = ?;"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        cursor.execute(sql, (contagem, id))
+        conexao.commit()
+        conexao.close()
+        return True

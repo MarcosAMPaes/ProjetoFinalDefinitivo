@@ -76,17 +76,6 @@ async def postItemMenos1(request: Request):
     vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente)
     ItemVendaRepo.apagarPorIdVenda(vendasDoCliente[-1].id)
     VendaRepo.excluirUmaVenda(vendasDoCliente[-1].id)
-
-    return RedirectResponse('/carrinho',status_code=status.HTTP_302_FOUND)
-
-@router.post('/apagarItem')
-async def postItemMenos1(request: Request):
-    token = request.cookies.values().mapping["auth_token"]
-    idCliente = ClienteRepo.obterPorToken(token).id
-    vendasDoCliente = VendaRepo.obterVendaPorCliente(idCliente)
-    ItemVendaRepo.apagarPorIdVenda(vendasDoCliente[-1].id)
-    VendaRepo.excluirUmaVenda(vendasDoCliente[-1].id)
-
     return RedirectResponse('/carrinho',status_code=status.HTTP_302_FOUND)
 
 
@@ -166,6 +155,13 @@ async def root(request: Request):
 @router.get('/cliente_endereco', response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("cliente_endereco.html", {"request": request,})
+
+@router.post('/cliente_endereco')
+async def root(request: Request, cep: str=Form(...), numero: str=Form(...)):
+    token = request.cookies.values().mapping["auth_token"]
+    ClienteRepo.inserirPorToken(token, cep, numero)
+    return RedirectResponse('/fechamento_endereco',status_code=status.HTTP_302_FOUND)
+
 
 @router.get('/cliente_favoritos', response_class=HTMLResponse)
 async def root(request: Request):

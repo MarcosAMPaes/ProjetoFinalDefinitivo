@@ -62,7 +62,7 @@
                             </h3>
                             <hr>
                             <form action="">
-                                <h4>Valor da Compra: <b>R$ 15.000,86</b></h4>
+                                <h4>Valor da Compra:<b>R$ {{valorTotal}}</b></h4>
                                 <br>
                                 <p>
                                     Informe seu cpf no campo abaixo.
@@ -82,9 +82,12 @@
                     <a href="/fechamento_endereco" class="btn btn-outline-success btn-lg mb-4">
                         Voltar aos Endereços
                     </a>
-                    <a href="/fechamento_pedido" class="btn btn-danger btn-lg ms-2 mb-4">Finalizar</a>
+                    <form method="post" action="/quitarVendas">
+                        <button type="submit" class="btn btn-danger btn-lg ms-2 mb-4">Finalizar</button>
+                    </form>
                 </div>
             </div>
         </main>
+
 
         {% endblock %}

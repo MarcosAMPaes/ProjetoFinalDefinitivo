@@ -9,7 +9,6 @@ class Cliente:
     email: str
     senha: Optional[str] = ""
     telefone: Optional[str] = ""
-    endLogradouro: Optional[str] = ""
     endNumero: Optional[str] = ""
     cep: Optional[str] = ""
     token: Optional[str] = ""

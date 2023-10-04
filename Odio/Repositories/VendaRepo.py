@@ -39,7 +39,7 @@ class VendaRepo:
     
     @classmethod
     def obterVendaPorCliente(cls, idCliente: int) -> Venda:
-        sql = "SELECT * FROM venda WHERE idCliente = ?"
+        sql = "SELECT * FROM venda WHERE idCliente = ? and status=0"
         conexao = Database.criarConexao()
         cursor = conexao.cursor()
         resultado = cursor.execute(sql,(idCliente,)).fetchall()
@@ -55,3 +55,13 @@ class VendaRepo:
         conexao.commit()
         conexao.close()
         return True
+    
+    @classmethod
+    def quitarVenda(cls,id:int) -> Venda:
+        sql = "UPDATE venda SET status=1 WHERE id=?"
+        conexao = Database.criarConexao()
+        cursor = conexao.cursor()
+        resultado = cursor.execute(sql, (id,))
+        conexao.commit()
+        conexao.close()
+        return resultado.rowcount > 0

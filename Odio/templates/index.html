@@ -21,13 +21,19 @@
         </button>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav flex-grow-1 justify-content-center">
+                {% if filtro == False%}
                 {% for c in categorias %}
-                <form method="post" action="/PorCategoria?idCategoria={{c.id}}" id="meuFormulario">
-                    <li class="nav-item">
-                        <a class="nav-link text-white text-invi" href="/PorCategoria?idCategoria={{c.id}}" id="meuLink">{{c.nome}}</a>
-                    </li>
-                </form>
+                    <form method="post" action="/PorCategoria?idCategoria={{c.id}}" id="meuFormulario">
+                        <li class="nav-item">
+                            <a class="nav-link text-white text-invi" href="/PorCategoria?idCategoria={{c.id}}" id="meuLink">{{c.nome}}</a>
+                        </li>
+                    </form>
                 {% endfor %}
+                {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link text-white text-invi" href="/" id="meuLink">Todos</a>
+                        </li>
+                {% endif %}
             </ul>
             <div class="align-self-end">
                 <ul class="navbar-nav">
@@ -49,12 +55,12 @@
                     <div class="col-12 col-md-5">
                         <form class="justify-content-center justify-content-md-start mb-3 mb-md-0">
                             <div class="input-group input-group-sm">
-                                <input type="text" class="form-control" placeholder="Digite aqui o que procura">
-                                <button class="btn btn-danger">Buscar</button>
+                                <input type="text" class="form-control mt-3" placeholder="Digite aqui o que procura">
+                                <button class="btn btn-danger mt-3">Buscar</button>
                             </div>
                         </form>
                     </div>
-                    <div class="col-12 col-md-7">
+                    <div class="col-12 col-md-7 mt-3">
                         <div class="d-flex flex-row-reverse justify-content-center justify-content-md-start">
                             <form class="d-inline-block">
                                 <select class="form-select form-select-sm">
@@ -63,28 +69,6 @@
                                     <option>Ordenar pelo maior preço</option>
                                 </select>
                             </form>
-                            <nav class="d-inline-block me-3">
-                                <ul class="pagination pagination-sm my-0">
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">1</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">2</a>
-                                    </li>
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#">3</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">4</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">5</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">6</a>
-                                    </li>
-                                </ul>
-                            </nav>
                         </div>
                     </div>
                 </div>
@@ -97,11 +81,11 @@
                             <a href="#" class="position-absolute end-0 p-2 text-danger">
                                 <i class="bi-suit-heart" style="font-size: 24px; line-height: 24px;"></i>
                             </a>
-                            <a href="/produto.html">
+                            <a href="/produto?id={{ p.id }}">
                                 <img style="width: 200px; height: 250px;" src="/static/img/{{p.imgProduto }}" class="card-img-top p-2">
                             </a>
                             <div class="card-header">
-                                {{ p.preco }}
+                                R${{ p.preco }}
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title">{{ p.nome }}</h5>
@@ -132,35 +116,41 @@
                 <div class="row pb-3">
                     <div class="col-12">
                         <div class="d-flex flex-row-reverse justify-content-center justify-content-md-start">
-                            <form class="d-inline-block">
-                                <select class="form-select form-select-sm">
-                                    <option>Ordenar pelo nome</option>
-                                    <option>Ordenar pelo menor preço</option>
-                                    <option>Ordenar pelo maior preço</option>
-                                </select>
-                            </form>
-                            <nav class="d-inline-block me-3">
-                                <ul class="pagination pagination-sm my-0">
+                            {% if totalPaginas > 1 %}
+                            <nav>
+                                <ul class="pagination pagination-sm">
                                     <li class="page-item">
-                                        <a class="page-link" href="#">1</a>
+                                        <a class="page-link {{ 'disabled' if (paginaAtual == 1) }}" href="/?pa=1&tp={{ tamanhoPagina }}">
+                                            <i class="bi bi-arrow-left"></i>
+                                        </a>
                                     </li>
+                            
                                     <li class="page-item">
-                                        <a class="page-link" href="#">2</a>
+                                        <a class="page-link {{ 'disabled' if (paginaAtual == 1) }}" href="/?pa={{ paginaAtual-1 }}&tp={{ tamanhoPagina }}">
+                                            <i class="bi bi-arrow-left-short"></i>
+                                        </a>
                                     </li>
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#">3</a>
-                                    </li>
+                            
+                                    {% for i in range(totalPaginas) %}
                                     <li class="page-item">
-                                        <a class="page-link" href="#">4</a>
+                                        <a class="page-link {{ 'active' if (paginaAtual == i+1) }}" href="/?pa={{ i+1 }}&tp={{ tamanhoPagina }}">{{ i+1 }}</a>
                                     </li>
+                                    {% endfor %}
+                            
                                     <li class="page-item">
-                                        <a class="page-link" href="#">5</a>
+                                        <a class="page-link {{ 'disabled' if (paginaAtual == totalPaginas) }}" href="/?pa={{ paginaAtual+1 }}&tp={{ tamanhoPagina }}">
+                                            <i class="bi bi-arrow-right-short"></i>
+                                        </a>
                                     </li>
+                            
                                     <li class="page-item">
-                                        <a class="page-link" href="#">6</a>
+                                        <a class="page-link {{ 'disabled' if (paginaAtual == totalPaginas) }}" href="/?pa={{ totalPaginas }}&tp={{ tamanhoPagina }}">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
                                     </li>
                                 </ul>
                             </nav>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
