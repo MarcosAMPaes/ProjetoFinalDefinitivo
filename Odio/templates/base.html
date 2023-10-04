@@ -34,46 +34,48 @@
         </style>
 </head>
 
-<body>
-  <div class="d-flex flex-column wrapper">
-        <nav class=" navbar navbar-expand-lg navbar-dark bg-black border-bottom shadow-sm ">
-            <div class="container">
-                <a class="navbar-brand" href="/"><img src="{{ url_for('static', path='/img/foundtech.png') }}" class=""></a> 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav flex-grow-1">
+<div class="d-flex flex-column wrapper">
+    <nav class=" navbar navbar-expand-lg navbar-dark bg-black border-bottom shadow-sm ">
+        <div class="container">
+            <a class="navbar-brand" href="/"><img src="{{ url_for('static', path='/img/foundtech.png') }}" class=""></a> 
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target=".navbar-collapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/">Home</a>
+                    </li>
+
+                </ul>
+                <div class="align-self-end">
+                    <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="/contato">Contato</a>
+                            <a href="/cadastro" class="nav-link text-white">Cadastrar</a>
                         </li>
-                        <li class="nav-item d-none">
-                            <a class="nav-link text-white" href="/index">Principal</a>
+                        <li class="nav-item">
+                            <a href="/login" class="nav-link text-white">Login</a>
                         </li>
-                        
+                        <li class="nav-item">
+                            <a class="" href="/cliente"><img class=" p-2 rounded-4 " src="{{ url_for('static', path='\img\cart1.png') }}" alt="Cart"  width="48" ></a>
+                            <a class="" href="/carrinho"><img class=" p-2 rounded-4 " src="{{ url_for('static', path='\img\cart.png') }}" alt="Cart"  width="48" ></a>
+                            <a href="/carrinho" class=" text-white">
+                                <i class="bi-cart" style="font-size:24px;line-height:24px;"></i>
+                                <li class="nav-item">
+                                    <span class="badge rounded-pill  text-danger position-absolute ms-4 mt-0"
+                                        title="produtocarrinho"><small>5</small></span>
+                                    
+                                </li>
+                            </a>
+                        </li>
                     </ul>
-                    <div class="align-self-end">
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a href="/cadastro" class="nav-link text-white">Quero Me Cadastrar</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/login" class="nav-link text-white">Entrar</a>
-                            </li>
-                            <li class="nav-item">
-                                <span class="badge rounded-pill bg-light text-danger position-absolute ms-4 mt-0"
-                                    title="5 produto(s) no carrinho"><small>5</small></span>
-                                <a href="/carrinho" class="nav-link text-white">
-                                    <i class="bi-cart" style="font-size:24px;line-height:24px;"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
-        </nav>
-    
+        </div>
+    </nav>
+
+
   {% block conteudo %}
 
 

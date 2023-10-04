@@ -63,33 +63,7 @@ async def postProdutoCarrinho(request: Request,
 
 
 
-@router.get('/cliente_contatos', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("cliente_contatos.html", {"request": request,})
 
-@router.get('/cliente_dados', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("cliente_dados.html", {"request": request,})
-
-@router.get('/cliente_endereco', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("cliente_endereco.html", {"request": request,})
-
-@router.get('/cliente_favoritos', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("cliente_favoritos.html", {"request": request,})
-
-@router.get('/cliente_pedidos', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("cliente_pedidos.html", {"request": request,})
-
-@router.get('/cliente_senha', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("cliente_senha.html", {"request": request,})
-
-@router.get('/cliente', response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("cliente.html", {"request": request,})
 
 @router.get('/confirmcadastrosenha', response_class=HTMLResponse)
 async def root(request: Request):

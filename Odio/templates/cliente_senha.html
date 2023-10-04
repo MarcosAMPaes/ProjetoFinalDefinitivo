@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block conteudo %}
+<style>.bg-danger{
+    background-color: rgb(123, 207, 179);
+}</style>
  
         <main class="flex-fill">
             <div class="container">
@@ -22,7 +25,7 @@
                             <a href="/cliente_favoritos" class="list-group-item list-group-item-action">
                                 <i class="bi-heart fs-6"></i> Favoritos
                             </a>
-                            <a href="/cliente_senha" class="list-group-item list-group-item-action bg-danger text-light">
+                            <a href="/cliente_senha" class="list-group-item list-group-item-action text-light" style="background-color: rgb(123, 207, 179);">
                                 <i class="bi-lock fs-6"></i> Alterar Senha
                             </a>
                             <a href="/login" class="list-group-item list-group-item-action">

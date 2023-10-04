@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Excluir e Alterar Produtos</h1>
+
+</div>
+<hr>
+{% if produtos|length == 0 %}
+<p>Não há alunos cadastrados.</p>
+{% else %}
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th class="text-bg-dark">Nome do produto</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+    {% for a in produtos %}
+        <tr data-id="{{ a.id }}">
+            <td>{{ a.nome }}</td>
+            <td>
+                <button data-id="{{ a.id }}" class="btn btn-warning btn-sm" title="Desaprovar" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-person-lock"></i>
+                </button>
+                <a href="/excluirProduto{{ a.id }}" class="btn btn-danger btn-sm" title="Excluir" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </td>
+        </tr>    
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if totalPaginas > 1 %}
+<nav>
+    <ul class="pagination pagination-sm">
+        <li class="page-item">
+            <a class="page-link {{ 'disabled' if (paginaAtual == 1) }}" href="/excluirProduto?pa=1&tp={{ tamanhoPagina }}">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+        </li>
+
+        <li class="page-item">
+            <a class="page-link {{ 'disabled' if (paginaAtual == 1) }}" href="/excluirProduto?pa={{ paginaAtual-1 }}&tp={{ tamanhoPagina }}">
+                <i class="bi bi-arrow-left-short"></i>
+            </a>
+        </li>
+
+        {% for i in range(totalPaginas) %}
+        <li class="page-item">
+            <a class="page-link {{ 'active' if (paginaAtual == i+1) }}" href="/excluirProduto?pa={{ i+1 }}&tp={{ tamanhoPagina }}">{{ i+1 }}</a>
+        </li>
+        {% endfor %}
+
+        <li class="page-item">
+            <a class="page-link {{ 'disabled' if (paginaAtual == totalPaginas) }}" href="/excluirProduto?pa={{ paginaAtual+1 }}&tp={{ tamanhoPagina }}">
+                <i class="bi bi-arrow-right-short"></i>
+            </a>
+        </li>
+
+        <li class="page-item">
+            <a class="page-link {{ 'disabled' if (paginaAtual == totalPaginas) }}" href="/excluirProduto?pa={{ totalPaginas }}&tp={{ tamanhoPagina }}">
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block script %}
+<script src="/static/js/ativarTooltips.js"></script>
+{% if alunos|length > 0: %}
+<script src="/static/js/desaprovarCadastro.js"></script>
+{% endif %}
+
+{% endblock %}

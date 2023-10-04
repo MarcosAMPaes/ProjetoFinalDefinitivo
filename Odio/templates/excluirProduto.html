@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<h1>Exclusão de produto</h1>
+<hr>
+<p class="lead">Deseja realmente excluir o produto <b>{{ produto.nome }}</b>?</p>
+<form action="/excluirProduto" method="post">
+    <input type="hidden" name="id" value="{{ produto.id }}">
+    <div class="mb-3">
+        <a href="/admprodutoalt" class="btn btn-secondary me-2">Cancelar</a>
+        <button class="btn btn-danger" type="submit">Excluir</button>
+    </div>
+</form>
+
+{% endblock %}

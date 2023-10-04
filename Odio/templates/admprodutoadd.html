@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<Br>
+<Br>
+<Br>
+<Br>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <form method="post" class="col-sm-10 col-md-8 col-lg-6">
+                        <h1>Adicionar Produtos</h1>
+
+                        <div class="form-floating mb-3">
+                            <input type="nome" id="txtNome" class="form-control" placeholder=" " autofocus>
+                            <label for="">Nome</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="nome" id="txtNome" class="form-control" placeholder=" " autofocus>
+                            <label for="">Estoque</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="nome" id="txtNome" class="form-control" placeholder=" " autofocus>
+                            <label for="">Preço</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="nome" id="txtNome" class="form-control" placeholder=" " autofocus>
+                            <label for="">Descrição</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            
+                            <input type="file" placeholder="Selecione uam imagem" id="imagem" name="imagem" accept="image/*" required><br><br>
+                        </div>
+                    <div class="form-floating mb-3">
+                        <select name="Categoria" class="">
+                            <option value="">Selecione a categoria</option>
+                            <option value="xbox">fone</option>
+                            <option value="ps5">Cabos</option>
+                            <option value="nsw">Computador</option>
+                            <option value="pcg">watch</option>
+                        </select>
+                    </div>
+
+                        <button type="button" onclick="window.location.href='/'"
+                            class="btn btn-lg btn-danger">criar</button>
+
+                        
+                    </form>
+                </div>
+            </div>
+            <Br>
+                <Br>
+                <Br>
+                <Br>
+                    <Br>
+                        <Br>
+            {% endblock %}

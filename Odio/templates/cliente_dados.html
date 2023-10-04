@@ -1,13 +1,17 @@
 
 {% extends "base.html" %}
 {% block conteudo %}
+<style>.bg-danger{
+    background-color: rgb(123, 207, 179);
+}
+</style>
         <main class="flex-fill">
             <div class="container">
                 <h1>Minha Conta</h1>
                 <div class="row gx-3">
                     <div class="col-4">
                         <div class="list-group">
-                            <a href="/cliente_dados" class="list-group-item list-group-item-action bg-danger text-light">
+                            <a href="/cliente_dados" class="list-group-item list-group-item-action  text-light" style="background-color: rgb(123, 207, 179);">
                                 <i class="bi-person fs-6"></i> Dados Pessoais
                             </a>
                             <a href="/cliente_contatos" class="list-group-item list-group-item-action">
